@@ -54,8 +54,16 @@ del esquema, no dos sistemas de migración en paralelo.
    transacción de base de datos para pago + saldo + recibo + audit log juntos.
 9. **Reparto de pago entre lotes es manual**, nunca automático (confirmado
    con el negocio — ver BLUEPRINT.md §2).
-10. **No hardcodear** tipos de cargo, estados de lote/cliente/asignación,
-    métodos de pago, ni plantillas de mensajes — todo vive en configuración.
+10. **No hardcodear** tipos de cargo, métodos de pago, ni plantillas de
+    mensajes — todo vive en configuración. **Excepción explícita, decidida
+    en la revisión del SQL de Fase 1**: los estados de ciclo de vida
+    (`estado` de cliente/lote/asignación/pago/notificación) SÍ usan `CHECK`
+    constraint en la base de datos, no tabla de configuración — están
+    amarrados a lógica de negocio codificada (ej. "abandonar una asignación
+    requiere escrito de mora primero"), así que convertirlos en filas
+    configurables no daría flexibilidad real, solo indirección. La regla
+    de no-hardcodear aplica a lo que el negocio necesita cambiar sin tocar
+    código, no a los estados que la lógica del sistema interpreta.
 11. **Cambio visual y cambio de lógica/dinero, en commits separados siempre**,
     aunque toquen el mismo archivo.
 12. **Verificar cero referencias antes de borrar código**, y borrarlo en su
